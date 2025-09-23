@@ -24,12 +24,23 @@ class CadastroActivity : AppCompatActivity() {
             val senha = editSenha.text.toString()
             val confirmar = editConfirmar.text.toString()
 
-            if (senha == confirmar && email.isNotEmpty() && nome.isNotEmpty()) {
-                // Aqui salva no banco/disco
+            if (nome.isEmpty() || email.isEmpty() || senha.isEmpty() || confirmar.isEmpty()) {
+                Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (senha != confirmar) {
+                Toast.makeText(this, "As senhas não coincidem", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val sucesso = UsuarioRepository.cadastrar(email, senha)
+
+            if (sucesso) {
                 Toast.makeText(this, "Usuário cadastrado com sucesso!", Toast.LENGTH_SHORT).show()
                 finish() // volta para LoginActivity
             } else {
-                Toast.makeText(this, "Preencha corretamente os campos", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "E-mail já cadastrado!", Toast.LENGTH_SHORT).show()
             }
         }
     }

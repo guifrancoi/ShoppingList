@@ -22,19 +22,16 @@ class LoginActivity : AppCompatActivity() {
             val email = editEmail.text.toString()
             val senha = editSenha.text.toString()
 
-            // Exemplo bem simples para simular login
-            if (email == "teste@teste.com" && senha == "1234") {
-                // Login correto → vai para MainActivity
+            if (UsuarioRepository.autenticar(email, senha)) {
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
-                finish() // fecha a LoginActivity para não voltar nela ao apertar "voltar"
+                finish()
             } else {
                 Toast.makeText(this, "E-mail ou senha inválidos", Toast.LENGTH_SHORT).show()
             }
         }
 
         btnCadastro.setOnClickListener {
-            // Vai para tela de cadastro
             val intent = Intent(this, CadastroActivity::class.java)
             startActivity(intent)
         }
