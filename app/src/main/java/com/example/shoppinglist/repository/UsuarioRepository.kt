@@ -1,4 +1,4 @@
-package com.example.shoppinglist
+package com.example.shoppinglist.repository
 
 object UsuarioRepository {
     private val usuarios = mutableListOf<Pair<String, String>>() // email, senha
