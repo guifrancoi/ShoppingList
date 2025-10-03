@@ -13,7 +13,10 @@ import com.example.shoppinglist.adapters.ShoppingItemsAdapter
 import com.example.shoppinglist.databinding.DialogItemBinding
 import com.example.shoppinglist.databinding.FragmentListDetailBinding
 import com.example.shoppinglist.models.ShoppingItem
+import com.example.shoppinglist.models.Category
+import com.example.shoppinglist.repository.CategoryRepository
 import com.example.shoppinglist.ui.detail.ListDetailViewModel
+import com.example.shoppinglist.ui.CategoryDialogHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ListDetailFragment : Fragment() {
@@ -29,6 +32,7 @@ class ListDetailFragment : Fragment() {
     private val viewModel: ListDetailViewModel by viewModels()
     private lateinit var adapter: ShoppingItemsAdapter
     private var listId: Long = 0L
+    private var selectedCategory: Category? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +63,15 @@ class ListDetailFragment : Fragment() {
 
     private fun showAddItemDialog() {
         val dialogBinding = DialogItemBinding.inflate(layoutInflater)
+        selectedCategory = null
+
+        dialogBinding.buttonSelectCategory.setOnClickListener {
+            CategoryDialogHelper.showCategorySelectionDialog(requireActivity()) { category ->
+                selectedCategory = category
+                dialogBinding.buttonSelectCategory.text = category.nome
+            }
+        }
+
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Novo item")
             .setView(dialogBinding.root)
@@ -66,10 +79,23 @@ class ListDetailFragment : Fragment() {
                 val nome = dialogBinding.editNome.text.toString().trim()
                 val quantidade = dialogBinding.editQuantidade.text.toString().toDoubleOrNull() ?: 1.0
                 val unidade = dialogBinding.editUnidade.text.toString().trim()
-                val categoria = dialogBinding.editCategoria.text.toString().trim()
+
                 if (nome.isEmpty()) {
-                    Toast.makeText(requireContext(), "Nome é obrigatório", Toast.LENGTH_SHORT).show(); return@setPositiveButton }
-                val item = ShoppingItem(nome = nome, quantidade = quantidade, unidade = unidade, categoria = categoria)
+                    Toast.makeText(requireContext(), "Nome é obrigatório", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                if (selectedCategory == null) {
+                    Toast.makeText(requireContext(), "Selecione uma categoria", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val item = ShoppingItem(
+                    nome = nome,
+                    quantidade = quantidade,
+                    unidade = unidade,
+                    categoryId = selectedCategory!!.id
+                )
                 viewModel.addItem(item)
             }
             .setNegativeButton("Cancelar", null)
@@ -81,16 +107,30 @@ class ListDetailFragment : Fragment() {
         dialogBinding.editNome.setText(item.nome)
         dialogBinding.editQuantidade.setText(item.quantidade.toString())
         dialogBinding.editUnidade.setText(item.unidade)
-        dialogBinding.editCategoria.setText(item.categoria)
+
+        selectedCategory = CategoryRepository.findCategoryById(item.categoryId)
+        dialogBinding.buttonSelectCategory.text = selectedCategory?.nome ?: "Selecionar Categoria"
+
+        dialogBinding.buttonSelectCategory.setOnClickListener {
+            CategoryDialogHelper.showCategorySelectionDialog(requireActivity()) { category ->
+                selectedCategory = category
+                dialogBinding.buttonSelectCategory.text = category.nome
+            }
+        }
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Editar item")
             .setView(dialogBinding.root)
             .setPositiveButton("Salvar") { _, _ ->
+                if (selectedCategory == null) {
+                    Toast.makeText(requireContext(), "Selecione uma categoria", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
                 item.nome = dialogBinding.editNome.text.toString().trim()
                 item.quantidade = dialogBinding.editQuantidade.text.toString().toDoubleOrNull() ?: item.quantidade
                 item.unidade = dialogBinding.editUnidade.text.toString().trim()
-                item.categoria = dialogBinding.editCategoria.text.toString().trim()
+                item.categoryId = selectedCategory!!.id
                 viewModel.updateItem(item)
             }
             .setNegativeButton("Cancelar", null)
@@ -102,4 +142,3 @@ class ListDetailFragment : Fragment() {
         super.onDestroyView()
     }
 }
-

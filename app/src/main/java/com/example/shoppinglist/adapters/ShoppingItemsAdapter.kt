@@ -1,5 +1,6 @@
 package com.example.shoppinglist.adapters
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -7,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.databinding.ItemShoppingItemBinding
 import com.example.shoppinglist.models.ShoppingItem
+import com.example.shoppinglist.repository.CategoryRepository
 
 class ShoppingItemsAdapter(
     private val onEdit: (ShoppingItem) -> Unit,
@@ -19,14 +21,26 @@ class ShoppingItemsAdapter(
         fun bind(item: ShoppingItem) {
             binding.tvItemName.text = item.nome
             binding.tvItemQuantity.text = "${item.quantidade} ${item.unidade}"
-            binding.tvItemCategory.text = item.categoria
 
-            // Clique para editar
+            val category = CategoryRepository.findCategoryById(item.categoryId)
+            binding.tvItemCategory.text = category?.nome ?: "Sem categoria"
+
+            category?.let {
+                try {
+                    val color = Color.parseColor(it.cor)
+                    binding.viewCategoryIndicator.setBackgroundColor(color)
+                    binding.viewCategoryIndicator.visibility = android.view.View.VISIBLE
+                } catch (e: IllegalArgumentException) {
+                    binding.viewCategoryIndicator.visibility = android.view.View.GONE
+                }
+            } ?: run {
+                binding.viewCategoryIndicator.visibility = android.view.View.GONE
+            }
+
             binding.root.setOnClickListener {
                 onEdit(item)
             }
 
-            // Clique longo para excluir
             binding.root.setOnLongClickListener {
                 onDelete(item)
                 true

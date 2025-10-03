@@ -39,14 +39,25 @@
             android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_marginTop="6dp"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="8dp"
+        android:text="Categoria:"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonSelectCategory"
+        style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/categoria">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editCategoria"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </com.google.android.material.textfield.TextInputLayout>
+        android:text="Selecionar Categoria"
+        android:textAllCaps="false"
+        android:gravity="start|center_vertical"
+        app:icon="@android:drawable/ic_menu_sort_by_size"
+        app:iconGravity="end"
+        xmlns:app="http://schemas.android.com/apk/res-auto" />
+
 </LinearLayout>
