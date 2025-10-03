@@ -1,21 +1,43 @@
 package com.example.shoppinglist.repository
 
+import com.example.shoppinglist.models.User
+import java.util.UUID
+
 object UsuarioRepository {
-    private val usuarios = mutableListOf<Pair<String, String>>() // email, senha
+    private data class UserCredentials(
+        val user: User,
+        val senha: String
+    )
+    
+    private val usuarios = mutableListOf<UserCredentials>()
 
     init {
-        usuarios.add("teste@teste.com" to "1234")
+        usuarios.add(
+            UserCredentials(
+                user = User(
+                    id = UUID.randomUUID().toString(),
+                    nome = "Usuário Teste",
+                    email = "teste@teste.com"
+                ),
+                senha = "1234"
+            )
+        )
     }
 
-    fun cadastrar(email: String, senha: String): Boolean {
-        if (usuarios.any { it.first == email }) {
-            return false // já existe usuário com esse email
+    fun cadastrar(nome: String, email: String, senha: String): User? {
+        if (usuarios.any { it.user.email == email }) {
+            return null
         }
-        usuarios.add(email to senha)
-        return true
+        val newUser = User(
+            id = UUID.randomUUID().toString(),
+            nome = nome,
+            email = email
+        )
+        usuarios.add(UserCredentials(newUser, senha))
+        return newUser
     }
 
-    fun autenticar(email: String, senha: String): Boolean {
-        return usuarios.any { it.first == email && it.second == senha }
+    fun autenticar(email: String, senha: String): User? {
+        return usuarios.find { it.user.email == email && it.senha == senha }?.user
     }
 }
