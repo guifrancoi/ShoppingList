@@ -1,13 +1,14 @@
 package com.example.shoppinglist.adapters
 
-import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.databinding.ItemCategoryBinding
 import com.example.shoppinglist.models.Category
+import com.example.shoppinglist.repository.CategoryRepository
 
 class CategoriesAdapter(
     private val onEditClick: (Category) -> Unit,
@@ -35,19 +36,22 @@ class CategoriesAdapter(
             binding.apply {
                 textCategoryName.text = category.nome
 
-                try {
-                    val color = Color.parseColor(category.cor)
-                    viewCategoryColor.setBackgroundColor(color)
-                } catch (e: IllegalArgumentException) {
-                    viewCategoryColor.setBackgroundColor(Color.parseColor("#6200EE"))
-                }
+                ivCategoryIcon.setImageResource(CategoryRepository.getCategoryIcon(category))
 
-                buttonEditCategory.setOnClickListener {
-                    onEditClick(category)
-                }
+                if (category.isPadrao) {
+                    buttonEditCategory.visibility = View.GONE
+                    buttonDeleteCategory.visibility = View.GONE
+                } else {
+                    buttonEditCategory.visibility = View.VISIBLE
+                    buttonDeleteCategory.visibility = View.VISIBLE
+                    
+                    buttonEditCategory.setOnClickListener {
+                        onEditClick(category)
+                    }
 
-                buttonDeleteCategory.setOnClickListener {
-                    onDeleteClick(category)
+                    buttonDeleteCategory.setOnClickListener {
+                        onDeleteClick(category)
+                    }
                 }
             }
         }
