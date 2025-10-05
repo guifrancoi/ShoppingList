@@ -1,17 +1,19 @@
 package com.example.shoppinglist
 
-import android.app.AlertDialog
-import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.shoppinglist.adapters.CategoriesAdapter
 import com.example.shoppinglist.databinding.ActivityCategoriesBinding
-import com.example.shoppinglist.databinding.DialogCategoryBinding
 import com.example.shoppinglist.models.Category
 import com.example.shoppinglist.repository.CategoryRepository
+import com.example.shoppinglist.session.UserSession
+import com.example.shoppinglist.ui.categories.AddCategoryFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class CategoriesActivity : AppCompatActivity() {
 
@@ -20,9 +22,14 @@ class CategoriesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityCategoriesBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
         setupRecyclerView()
         setupListeners()
         loadCategories()
@@ -43,88 +50,43 @@ class CategoriesActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadCategories()
+    }
+
     private fun loadCategories() {
-        adapter.submitList(CategoryRepository.getAllCategories())
+        val userId = UserSession.getCurrentUserId()
+        adapter.submitList(CategoryRepository.getAllCategories(userId))
     }
 
     private fun showCategoryDialog(category: Category? = null) {
-        val dialogBinding = DialogCategoryBinding.inflate(layoutInflater)
-        val isEditing = category != null
-
-        dialogBinding.textDialogTitle.text = if (isEditing) "Editar Categoria" else "Nova Categoria"
-
-        if (isEditing) {
-            dialogBinding.editTextCategoryName.setText(category!!.nome)
-        }
-
-        var selectedColor = category?.cor ?: "#D32F2F"
-
-        val colorViews = listOf(
-            dialogBinding.color1 to "#D32F2F",
-            dialogBinding.color2 to "#388E3C",
-            dialogBinding.color3 to "#F57C00",
-            dialogBinding.color4 to "#1976D2",
-            dialogBinding.color5 to "#512DA8",
-            dialogBinding.color6 to "#00796B",
-            dialogBinding.color7 to "#7B1FA2",
-            dialogBinding.color8 to "#616161"
-        )
-
-        colorViews.forEach { (view, color) ->
-            view.setOnClickListener {
-                selectedColor = color
-                colorViews.forEach { (v, _) ->
-                    v.alpha = if (v == view) 1.0f else 0.5f
+        val addCategoryFragment = AddCategoryFragment.newInstance(category)
+        addCategoryFragment.setOnCategorySavedListener { updatedCategory ->
+            val userId = UserSession.getCurrentUserId()
+            if (category != null) {
+                val existingCategory = CategoryRepository.findCategoryByName(updatedCategory.nome, userId)
+                if (existingCategory != null && existingCategory.id != category.id) {
+                    Toast.makeText(this, "Já existe uma categoria com esse nome", Toast.LENGTH_SHORT).show()
+                    return@setOnCategorySavedListener
                 }
-            }
-            if (isEditing && color == category!!.cor) {
-                view.alpha = 1.0f
-            } else {
-                view.alpha = 0.5f
-            }
-        }
-
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogBinding.root)
-            .create()
-
-        dialogBinding.buttonCancel.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialogBinding.buttonSave.setOnClickListener {
-            val name = dialogBinding.editTextCategoryName.text.toString().trim()
-
-            if (name.isEmpty()) {
-                Toast.makeText(this, "Nome da categoria é obrigatório", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val existingCategory = CategoryRepository.findCategoryByName(name)
-            if (existingCategory != null && existingCategory.id != category?.id) {
-                Toast.makeText(this, "Já existe uma categoria com esse nome", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (isEditing) {
-                val updatedCategory = category!!.copy(nome = name, cor = selectedColor)
                 CategoryRepository.updateCategory(updatedCategory)
                 Toast.makeText(this, "Categoria atualizada com sucesso", Toast.LENGTH_SHORT).show()
             } else {
-                val newCategory = Category(nome = name, cor = selectedColor)
-                CategoryRepository.addCategory(newCategory)
-                Toast.makeText(this, "Categoria criada com sucesso", Toast.LENGTH_SHORT).show()
+                val existingCategory = CategoryRepository.findCategoryByName(updatedCategory.nome, userId)
+                if (existingCategory != null) {
+                    Toast.makeText(this, "Já existe uma categoria com esse nome", Toast.LENGTH_SHORT).show()
+                    return@setOnCategorySavedListener
+                }
+                CategoryRepository.addCategory(updatedCategory.copy(userId = userId))
             }
-
             loadCategories()
-            dialog.dismiss()
         }
-
-        dialog.show()
+        addCategoryFragment.show(supportFragmentManager, "AddCategoryFragment")
     }
 
     private fun showDeleteConfirmation(category: Category) {
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Confirmar exclusão")
             .setMessage("Deseja realmente excluir a categoria '${category.nome}'?")
             .setPositiveButton("Excluir") { _, _ ->
