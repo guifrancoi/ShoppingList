@@ -3,7 +3,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     
-    <!-- Cores do tema verde -->
     <color name="green_primary">#237d48</color>
     <color name="green_primary_dark">#1a5f37</color>
     <color name="green_primary_light">#2ea85c</color>
