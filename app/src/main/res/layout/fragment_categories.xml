@@ -5,81 +5,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:fitsSystemWindows="false">
+    android:background="@android:color/white">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/search_bar_layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:hint="Buscar"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
-        app:hintEnabled="false"
-        app:layout_constraintEnd_toStartOf="@id/btnCategories"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:startIconDrawable="@drawable/ic_search">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/searchEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Buscar"
-            android:inputType="text"
-            android:maxLines="1"
-            android:paddingVertical="12dp" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <ImageView
-        android:id="@+id/btnCategories"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBack"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="10dp"
-        android:src="@drawable/ic_category"
-        app:tint="@color/green_primary"
-        app:layout_constraintBottom_toBottomOf="@id/search_bar_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/search_bar_layout"
-        tools:ignore="ContentDescription" />
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="Voltar"
+        app:icon="@drawable/ic_arrow_back"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconTint="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/toolbarDetail"
+        android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="8dp"
+        android:text="Categorias"
         android:textColor="@android:color/black"
         android:textSize="26sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_bar_layout"
-        tools:text="Supermercado" />
+        app:layout_constraintBottom_toBottomOf="@id/btnBack"
+        app:layout_constraintStart_toEndOf="@id/btnBack"
+        app:layout_constraintTop_toTopOf="@id/btnBack" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewItems"
+        android:id="@+id/recyclerViewCategories"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:clipToPadding="false"
-        android:paddingHorizontal="0dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarDetail"
-        tools:listitem="@layout/item_shopping_item" />
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        tools:listitem="@layout/item_category" />
 
     <LinearLayout
         android:id="@+id/emptyStateLayout"
@@ -96,7 +63,7 @@
         <ImageView
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:src="@drawable/ic_basket"
+            android:src="@drawable/ic_category"
             android:alpha="0.3"
             app:tint="@color/black"
             tools:ignore="ContentDescription" />
@@ -105,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Nenhum item encontrado"
+            android:text="Nenhuma categoria encontrada"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/black" />
@@ -114,7 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Toque no botão + para adicionar um item"
+            android:text="Toque no botão + para adicionar uma categoria"
             android:textSize="14sp"
             android:textColor="#666666"
             android:gravity="center" />
@@ -122,11 +89,11 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddItem"
+        android:id="@+id/fabAddCategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:contentDescription="Adicionar item"
+        android:contentDescription="Adicionar categoria"
         app:backgroundTint="@color/green_primary"
         app:tint="@android:color/white"
         app:srcCompat="@drawable/ic_add"
