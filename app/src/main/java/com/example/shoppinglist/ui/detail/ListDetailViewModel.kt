@@ -10,26 +10,30 @@ import com.example.shoppinglist.repository.ShoppingRepository
 class ListDetailViewModel : ViewModel() {
     private val _listaSelecionada = MutableLiveData<ShoppingList?>()
     val listaSelecionada: LiveData<ShoppingList?> = _listaSelecionada
+    
+    private var currentListId: Long = 0L
 
     fun loadList(listId: Long) {
-        _listaSelecionada.value = ShoppingRepository.findListById(listId)
+        currentListId = listId
+        refresh()
+    }
+    
+    fun refresh() {
+        _listaSelecionada.value = ShoppingRepository.findListById(currentListId)
     }
 
     fun addItem(item: ShoppingItem) {
-        val list = _listaSelecionada.value ?: return
-        ShoppingRepository.addItemToList(list.id, item)
-        loadList(list.id) // recarrega
+        ShoppingRepository.addItemToList(currentListId, item)
+        refresh()
     }
 
     fun updateItem(item: ShoppingItem) {
-        val list = _listaSelecionada.value ?: return
-        ShoppingRepository.updateItemInList(list.id, item)
-        loadList(list.id)
+        ShoppingRepository.updateItemInList(currentListId, item)
+        refresh()
     }
 
     fun removeItem(itemId: Long) {
-        val list = _listaSelecionada.value ?: return
-        ShoppingRepository.removeItemFromList(list.id, itemId)
-        loadList(list.id)
+        ShoppingRepository.removeItemFromList(currentListId, itemId)
+        refresh()
     }
 }
