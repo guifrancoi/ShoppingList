@@ -1,7 +1,24 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.ShoppingList" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <!-- Usar o mesmo tema claro no modo noturno -->
+    <style name="Base.Theme.ShoppingList" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Cores primárias em verde -->
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryVariant">@color/green_primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <!-- Cores secundárias -->
+        <item name="colorSecondary">@color/green_secondary</item>
+        <item name="colorSecondaryVariant">@color/green_secondary_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
+        <!-- Background branco -->
+        <item name="android:colorBackground">@color/background_white</item>
+        <item name="colorSurface">@color/background_white</item>
+        <item name="colorOnBackground">@color/black</item>
+        <item name="colorOnSurface">@color/black</item>
+        
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/green_primary_dark</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
     </style>
 </resources>
